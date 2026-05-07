@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Learning Journey - Grade 6-9</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8fafc;
+            color: #1f2937;
+        }
+
+        /* Flashcard Animations */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        .flashcard-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: #86efac; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4ade80; }
+
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Grid Card Styling */
+        .mini-card {
+            height: 240px;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- APP CONTAINER -->
+    <div id="app" class="max-w-6xl mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden flex flex-col border-x border-gray-100">
+        
+        <!-- ================= HOME VIEW ================= -->
+        <div id="home-view" class="flex-1 flex flex-col h-full w-full absolute transition-transform duration-500 ease-in-out">
+            <!-- Header -->
+            <div class="bg-indigo-600 text-white p-8 rounded-b-[3rem] shadow-lg z-10">
+                <div class="flex justify-between items-center mb-4">
+                    <h1 class="text-3xl font-extrabold">Welcome back, Scholar! 🚀</h1>
+                    <div class="flex items-center bg-indigo-700 px-4 py-2 rounded-full text-sm font-bold border border-indigo-500">
+                        <i class="fa-solid fa-fire text-yellow-300 mr-2"></i> <span id="streak-count">0 Day Streak</span>
+                    </div>
+                </div>
+                <p class="text-indigo-100 text-lg">Complete your 7-day streak to unlock the ultimate Achievement Badge!</p>
+            </div>
+
+            <!-- Map/Journey -->
+            <div class="flex-1 overflow-y-auto p-8 relative pb-32">
+                <h2 class="text-2xl font-bold text-gray-800 mb-10 text-center">Your Learning Path: Week 1</h2>
+                
+                <div class="relative flex flex-col items-center gap-12 z-10">
+                    <!-- Line connecting nodes -->
+                    <div class="absolute top-10 bottom-10 w-1.5 bg-gray-100 -z-10 left-1/2 transform -translate-x-1/2"></div>
+                    
+                    <!-- Lesson 1 (Active) -->
+                    <div class="relative w-full flex items-center justify-center cursor-pointer group" onclick="startLesson()">
+                        <div class="bg-indigo-500 text-white w-20 h-20 rounded-3xl flex items-center justify-center text-3xl font-bold shadow-xl shadow-indigo-100 z-10 border-4 border-white group-hover:scale-110 transition-transform rotate-3 group-hover:rotate-0">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <div class="absolute left-1/2 ml-14 bg-white px-6 py-3 rounded-2xl shadow-md border border-indigo-50 whitespace-nowrap">
+                            <p class="font-bold text-indigo-600">Lesson 1</p>
+                            <p class="text-sm text-gray-500">School & Study</p>
+                        </div>
+                    </div>
+
+                    <!-- Lesson 2 (Locked) -->
+                    <div class="relative w-full flex items-center justify-center opacity-60">
+                        <div class="bg-gray-200 text-gray-400 w-16 h-16 rounded-3xl flex items-center justify-center text-2xl shadow-inner z-10 border-4 border-white">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div class="absolute right-1/2 mr-14 bg-gray-50 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap text-right">
+                            <p class="font-bold text-gray-500">Lesson 2</p>
+                            <p class="text-xs text-gray-400">Locked</p>
+                        </div>
+                    </div>
+
+                    <!-- Lesson 3 (Locked) -->
+                    <div class="relative w-full flex items-center justify-center opacity-60">
+                        <div class="bg-gray-200 text-gray-400 w-16 h-16 rounded-3xl flex items-center justify-center text-2xl shadow-inner z-10 border-4 border-white">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div class="absolute left-1/2 ml-14 bg-gray-50 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap">
+                            <p class="font-bold text-gray-500">Lesson 3</p>
+                            <p class="text-xs text-gray-400">Locked</p>
+                        </div>
+                    </div>
+
+                     <!-- Lesson 4 (Locked) -->
+                     <div class="relative w-full flex items-center justify-center opacity-60">
+                        <div class="bg-gray-200 text-gray-400 w-16 h-16 rounded-3xl flex items-center justify-center text-2xl shadow-inner z-10 border-4 border-white">
+                            <i class="fa-solid fa-lock"></i>
+                        </div>
+                        <div class="absolute right-1/2 mr-14 bg-gray-50 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap text-right">
+                            <p class="font-bold text-gray-500">Lesson 4</p>
+                            <p class="text-xs text-gray-400">Locked</p>
+                        </div>
+                    </div>
+
+                    <!-- Lesson 5 (Locked) -->
+                    <div class="relative w-full flex items-center justify-center opacity-60 mb-12">
+                        <div class="bg-yellow-100 text-yellow-500 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-inner z-10 border-4 border-white">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div class="absolute left-1/2 ml-14 bg-gray-50 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap">
+                            <p class="font-bold text-gray-500">Lesson 5</p>
+                            <p class="text-sm text-gray-400">Weekly Review</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Bottom CTA -->
+            <div class="absolute bottom-0 w-full bg-white p-6 border-t border-gray-100 shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.05)] z-20">
+                <button onclick="startLesson()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-3xl shadow-xl shadow-indigo-100 transform transition active:scale-[0.98] text-xl">
+                    START LESSON 1 NOW <i class="fa-solid fa-bolt ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= LESSON VIEW ================= -->
+        <div id="lesson-view" class="flex-1 flex flex-col h-full w-full absolute translate-x-full transition-transform duration-500 ease-in-out bg-slate-50">
+            <!-- Header -->
+            <div class="bg-white px-8 py-5 flex items-center shadow-sm z-10 border-b border-gray-100">
+                <button onclick="goHome()" class="w-12 h-12 flex items-center justify-center rounded-2xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-circle-xmark text-2xl"></i>
+                </button>
+                <div class="flex-1 mx-8">
+                    <div class="flex justify-between text-sm font-bold text-gray-400 mb-2 uppercase tracking-widest">
+                        <span id="lesson-title">Lesson 1: School & Study</span>
+                        <span id="progress-text">0%</span>
+                    </div>
+                    <div class="w-full bg-gray-100 rounded-full h-3">
+                        <div id="progress-bar" class="bg-indigo-500 h-3 rounded-full transition-all duration-700 shadow-sm" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic Content Area -->
+            <div id="task-container" class="flex-1 overflow-y-auto p-8 lg:p-12 pb-32">
+                <!-- Task content injected here -->
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="absolute bottom-0 w-full bg-white p-6 border-t border-gray-100 z-20 flex justify-center">
+                <div class="max-w-4xl w-full flex gap-4">
+                    <button id="btn-check" class="hidden flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-4 rounded-2xl shadow-lg transition active:scale-95 text-lg">
+                        Check Answer
+                    </button>
+                    <button id="btn-next" class="hidden flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-4 rounded-2xl shadow-xl shadow-emerald-50 transition active:scale-95 text-lg">
+                        Continue <i class="fa-solid fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <!-- ================= JAVASCRIPT LOGIC ================= -->
+    <script>
+        // --- DATA ---
+        const lessonData = {
+            tasks: [
+                {
+                    type: "warmup",
+                    title: "Warm up: My school words",
+                    questions: [
+                        "Name 5 things you use at school.",
+                        "Name 3 things students do before a test."
+                    ]
+                },
+                {
+                    type: "flashcard",
+                    title: "Flashcard Set A: Vocabulary & Collocations",
+                    items: [
+                        // VOCABULARY (20 items)
+                        { word: "subject", type: "n.", vn: "môn học", en: "an area you study at school", ex: "Math is my favorite subject because I like solving problems." },
+                        { word: "timetable", type: "n.", vn: "thời khóa biểu", en: "a list showing when lessons happen", ex: "Our timetable changes every Monday." },
+                        { word: "assignment", type: "n.", vn: "bài tập/nhiệm vụ được giao", en: "a piece of school work given by a teacher", ex: "I have to finish my English assignment tonight." },
+                        { word: "homework", type: "n.", vn: "bài tập về nhà", en: "school work you do at home", ex: "I usually do my homework after dinner." },
+                        { word: "project", type: "n.", vn: "dự án/bài làm nhóm", en: "a piece of work that takes time and has a goal", ex: "We are doing a science project about plants." },
+                        { word: "presentation", type: "n.", vn: "bài thuyết trình", en: "a short talk to explain something to others", ex: "Our group will give a presentation on Friday." },
+                        { word: "exam", type: "n.", vn: "kỳ thi", en: "a formal test of knowledge", ex: "I feel nervous before an exam." },
+                        { word: "test", type: "n./v.", vn: "bài kiểm tra/kiểm tra", en: "a short exam or a way to check knowledge", ex: "We have a vocabulary test tomorrow." },
+                        { word: "grade", type: "n.", vn: "điểm/số điểm/xếp loại", en: "a score or level for school work", ex: "She got a good grade in English." },
+                        { word: "mark", type: "n.", vn: "điểm", en: "a number or letter showing how good work is", ex: "My mark improved after I revised more carefully." },
+                        { word: "revise", type: "v.", vn: "ôn tập", en: "study again before a test", ex: "I revise new words every two days." },
+                        { word: "memorize", type: "v.", vn: "ghi nhớ/học thuộc", en: "learn something so you can remember it", ex: "I use flashcards to memorize spelling." },
+                        { word: "concentrate", type: "v.", vn: "tập trung", en: "give all your attention to something", ex: "I cannot concentrate when my phone is near me." },
+                        { word: "distraction", type: "n.", vn: "sự xao nhãng", en: "something that stops you from focusing", ex: "Noise is a big distraction when I study." },
+                        { word: "deadline", type: "n.", vn: "hạn nộp/hạn chót", en: "the final time to finish something", ex: "The deadline for the project is next Tuesday." },
+                        { word: "notebook", type: "n.", vn: "vở ghi/sổ tay", en: "a book for writing notes", ex: "I keep new words in a small notebook." },
+                        { word: "textbook", type: "n.", vn: "sách giáo khoa", en: "a book used for studying a subject", ex: "Please open your textbook to page 20." },
+                        { word: "uniform", type: "n.", vn: "đồng phục", en: "special clothes students wear at school", ex: "We wear a blue uniform at school." },
+                        { word: "classmate", type: "n.", vn: "bạn cùng lớp", en: "a student in the same class", ex: "My classmate helps me with difficult homework." },
+                        { word: "teacher", type: "n.", vn: "giáo viên", en: "a person who teaches students", ex: "Our teacher explains grammar clearly." },
+                        // COLLOCATIONS (9 items)
+                        { word: "revise for a test", type: "verb + prep + noun", vn: "ôn tập cho bài kiểm tra", en: "review materials before an exam", ex: "I revise for a test by reading my notes again." },
+                        { word: "submit an assignment", type: "verb + noun", vn: "nộp bài được giao", en: "hand in school work", ex: "We must submit an assignment before Friday." },
+                        { word: "take notes", type: "verb + noun", vn: "ghi chú", en: "write down information", ex: "I take notes when the teacher explains new ideas." },
+                        { word: "pay attention", type: "verb + noun", vn: "chú ý/tập trung nghe", en: "listen and watch carefully", ex: "Please pay attention during the lesson." },
+                        { word: "make a mistake", type: "verb + noun", vn: "mắc lỗi", en: "do something wrong", ex: "It is normal to make a mistake when learning English." },
+                        { word: "improve my English", type: "verb + possessive + noun", vn: "cải thiện tiếng Anh của tôi", en: "make my English better", ex: "I read short stories to improve my English." },
+                        { word: "solve a problem", type: "verb + noun", vn: "giải quyết vấn đề", en: "find an answer to a difficulty", ex: "Our group worked together to solve a problem." },
+                        { word: "work in groups", type: "verb + prep + noun", vn: "làm việc theo nhóm", en: "study with other students", ex: "We work in groups during project lessons." },
+                        { word: "ask questions", type: "verb + noun", vn: "đặt câu hỏi", en: "say things to get more information", ex: "Good students ask questions when they do not understand." }
+                    ]
+                },
+                {
+                    type: "context",
+                    title: "Context Guessing",
+                    questions: [
+                        { q: "I need to finish my ___ before Friday because the teacher will collect it in class.", options: ["subject", "assignment", "timetable"], ans: 1 },
+                        { q: "Minh always ___ carefully, so he can remember the lesson more easily.", options: ["takes notes", "makes a mistake", "submits an assignment"], ans: 0 },
+                        { q: "We have a science ___ next week, and my group is still preparing the slides.", options: ["presentation", "uniform", "grade"], ans: 0 },
+                        { q: "During the math lesson, Lan couldn’t ___ because her classmates were talking loudly.", options: ["memorize", "revise", "concentrate"], ans: 2 },
+                        { q: "I usually ___ by reading my notebook and doing practice questions.", options: ["revise for a test", "make a mistake", "take notes"], ans: 0 },
+                        { q: "What's your favorite school ___? - English, because I enjoy speaking activities.", options: ["subject", "assignment", "classmate"], ans: 0 }
+                    ]
+                },
+                {
+                    type: "reading",
+                    title: "Reading: Busy School Day",
+                    passage: "Today was a busy day at school. In the morning, we had an English presentation about healthy lifestyles. My teacher asked us to pay attention and take notes during other groups’ presentations. After lunch, we worked on a group assignment in the library. I tried to concentrate, but some students were talking loudly. Before going home, I revised for tomorrow’s science test with my classmates.",
+                    questions: [
+                        { q: "The students worked on a group ________.", options: ["assignment", "timetable"], ans: 0 },
+                        { q: "The writer revised for a science ________.", options: ["test", "notebook"], ans: 0 }
+                    ]
+                }
+            ]
+        };
+
+        // --- STATE ---
+        let currentTaskIndex = 0;
+        let subStepIndex = 0; 
+        let isAnswered = false;
+        let flashcardPage = 0;
+        const flashcardsPerPage = 10;
+
+        // --- NAVIGATION LOGIC ---
+        function startLesson() {
+            document.getElementById('home-view').classList.add('-translate-x-full');
+            document.getElementById('lesson-view').classList.remove('translate-x-full');
+            currentTaskIndex = 0;
+            renderTask();
+        }
+
+        function goHome() {
+            if(confirm("Are you sure you want to exit? Your progress will be lost.")) {
+                document.getElementById('lesson-view').classList.add('translate-x-full');
+                document.getElementById('home-view').classList.remove('-translate-x-full');
+            }
+        }
+
+        function completeLesson() {
+            const container = document.getElementById('task-container');
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center mt-20 fade-in px-4">
+                    <div class="bg-yellow-100 p-8 rounded-full mb-8">
+                        <i class="fa-solid fa-trophy text-7xl text-yellow-500 animate-bounce"></i>
+                    </div>
+                    <h2 class="text-4xl font-extrabold text-indigo-600 mb-4">Excellent Work!</h2>
+                    <p class="text-gray-500 text-xl max-w-lg mb-10">You have completed Lesson 1 and earned 50 XP. Keep it up!</p>
+                    <button onclick="returnHomeSuccess()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-12 rounded-2xl shadow-xl transition active:scale-95 text-lg">
+                        Back to Home
+                    </button>
+                </div>
+            `;
+            document.getElementById('btn-next').classList.add('hidden');
+            updateProgress(100);
+        }
+
+        function returnHomeSuccess() {
+            document.getElementById('lesson-view').classList.add('translate-x-full');
+            document.getElementById('home-view').classList.remove('-translate-x-full');
+            document.getElementById('streak-count').innerText = '1 Day Streak';
+        }
+
+        function updateProgress(percent) {
+            document.getElementById('progress-bar').style.width = percent + '%';
+            document.getElementById('progress-text').innerText = Math.round(percent) + '%';
+        }
+
+        // --- RENDER LOGIC ---
+        function renderTask() {
+            const btnNext = document.getElementById('btn-next');
+            const btnCheck = document.getElementById('btn-check');
+            btnCheck.classList.add('hidden');
+            btnNext.classList.add('hidden'); // Hidden by default, specific logic per task type below
+            btnNext.onclick = handleNext;
+            isAnswered = false;
+
+            if (currentTaskIndex >= lessonData.tasks.length) {
+                completeLesson();
+                return;
+            }
+
+            const task = lessonData.tasks[currentTaskIndex];
+            subStepIndex = 0;
+            updateProgress((currentTaskIndex / lessonData.tasks.length) * 100);
+
+            const container = document.getElementById('task-container');
+            container.innerHTML = ''; 
+
+            switch (task.type) {
+                case 'warmup': 
+                    btnNext.classList.remove('hidden');
+                    btnNext.innerHTML = 'Continue <i class="fa-solid fa-chevron-right ml-2"></i>';
+                    renderWarmup(task, container); 
+                    break;
+                case 'flashcard': 
+                    // btnNext will only show on the last page of flashcards
+                    renderFlashcard(task, container); 
+                    break;
+                case 'context': 
+                    btnNext.classList.remove('hidden');
+                    btnNext.innerHTML = 'Next Question <i class="fa-solid fa-chevron-right ml-2"></i>';
+                    renderContext(task, container); 
+                    break;
+                case 'reading': 
+                    btnNext.classList.remove('hidden');
+                    btnNext.innerHTML = 'Next Question <i class="fa-solid fa-chevron-right ml-2"></i>';
+                    renderReading(task, container); 
+                    break;
+            }
+        }
+
+        function handleNext() {
+            const task = lessonData.tasks[currentTaskIndex];
+            
+            if (task.type === 'warmup') {
+                if (subStepIndex < task.questions.length - 1) {
+                    subStepIndex++;
+                    renderWarmup(task, document.getElementById('task-container'));
+                } else {
+                    currentTaskIndex++;
+                    renderTask();
+                }
+            } else if (task.type === 'flashcard') {
+                currentTaskIndex++;
+                renderTask();
+            } else if (task.type === 'context' || task.type === 'reading') {
+                if(!isAnswered) {
+                    alert("Please select an answer to continue!");
+                    return; 
+                }
+                if (subStepIndex < task.questions.length - 1) {
+                    subStepIndex++;
+                    isAnswered = false;
+                    if(task.type === 'context') renderContext(task, document.getElementById('task-container'));
+                    if(task.type === 'reading') renderReading(task, document.getElementById('task-container'));
+                } else {
+                    currentTaskIndex++;
+                    renderTask();
+                }
+            }
+        }
+
+        // --- TASK 1: WARM UP ---
+        function renderWarmup(task, container) {
+            container.innerHTML = `
+                <div class="mb-8 text-center">
+                    <span class="bg-blue-100 text-blue-800 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">Activity 1: Warming Up</span>
+                    <h2 class="text-3xl font-extrabold mt-4 text-gray-800">${task.title}</h2>
+                    <p class="text-gray-400 mt-2">Try to answer these questions out loud!</p>
+                </div>
+                <div class="bg-white rounded-[3rem] p-12 shadow-xl border border-gray-100 text-center min-h-[350px] flex flex-col justify-center items-center fade-in max-w-4xl mx-auto">
+                    <div class="bg-indigo-50 w-24 h-24 rounded-full flex items-center justify-center mb-8">
+                        <i class="fa-regular fa-comments text-4xl text-indigo-500"></i>
+                    </div>
+                    <h3 class="text-3xl lg:text-4xl font-bold text-gray-800 leading-tight">
+                        ${task.questions[subStepIndex]}
+                    </h3>
+                    <p class="mt-10 text-lg font-bold text-gray-300">Question ${subStepIndex + 1} of ${task.questions.length}</p>
+                </div>
+            `;
+        }
+
+        // --- TASK 2: FLASHCARDS (PAGINATED GRID) ---
+        function renderFlashcard(task, container) {
+            flashcardPage = 0;
+            window.allFlashcards = task.items;
+            
+            const totalPages = Math.ceil(window.allFlashcards.length / flashcardsPerPage);
+
+            container.innerHTML = `
+                <div class="mb-8 text-center">
+                    <span class="bg-purple-100 text-purple-800 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">Activity 2: Flashcards</span>
+                    <h2 class="text-3xl font-extrabold mt-4 text-gray-800">${task.title}</h2>
+                    <p class="text-gray-400 mt-2">Click each card to flip and learn. Click the speaker to hear pronunciation.</p>
+                </div>
+
+                <div id="flashcard-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6 mb-12 fade-in min-h-[500px]">
+                    <!-- Cards will be injected here -->
+                </div>
+
+                <div class="flex items-center justify-center gap-8 mt-8">
+                    <button id="fc-prev-btn" onclick="changeFCPage(-1)" class="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-400 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-gray-100">
+                        <i class="fa-solid fa-chevron-left text-xl"></i>
+                    </button>
+                    <div class="bg-white px-8 py-3 rounded-full shadow-sm border border-gray-100 font-black text-indigo-600 text-xl" id="fc-pagination">
+                        Set 1 of ${totalPages}
+                    </div>
+                    <button id="fc-next-btn" onclick="changeFCPage(1)" class="w-14 h-14 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-400 hover:text-indigo-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all border border-gray-100">
+                        <i class="fa-solid fa-chevron-right text-xl"></i>
+                    </button>
+                </div>
+            `;
+            updateFCGrid();
+        }
+
+        function updateFCGrid() {
+            const grid = document.getElementById('flashcard-grid');
+            const btnNext = document.getElementById('btn-next');
+            const totalPages = Math.ceil(window.allFlashcards.length / flashcardsPerPage);
+            const start = flashcardPage * flashcardsPerPage;
+            const end = Math.min(start + flashcardsPerPage, window.allFlashcards.length);
+            const pageItems = window.allFlashcards.slice(start, end);
+
+            grid.innerHTML = pageItems.map((item, idx) => `
+                <div class="perspective-1000 w-full mini-card cursor-pointer flashcard" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard-inner relative w-full h-full text-center transform-style-3d shadow-md rounded-2xl border border-gray-50">
+                        <!-- Front -->
+                        <div class="absolute w-full h-full backface-hidden bg-white rounded-2xl p-4 flex flex-col justify-center items-center">
+                            <span class="text-[10px] font-bold text-indigo-300 bg-indigo-50 px-2 py-0.5 rounded-full mb-2 uppercase tracking-tighter">${item.type}</span>
+                            <h3 class="text-base lg:text-lg font-black text-gray-800 text-center leading-tight mb-2">${item.word}</h3>
+                            <button onclick="event.stopPropagation(); playAudio('${item.word}')" class="text-indigo-400 hover:text-indigo-600 p-2 mb-1">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                            <p class="text-[10px] text-gray-400 mt-auto line-clamp-3 italic leading-tight">"${item.ex}"</p>
+                        </div>
+                        <!-- Back -->
+                        <div class="absolute w-full h-full backface-hidden bg-indigo-600 rounded-2xl p-4 flex flex-col justify-center items-center rotate-y-180 text-white overflow-y-auto">
+                            <p class="text-[10px] font-medium text-indigo-100 mb-1 leading-tight">${item.en}</p>
+                            <div class="w-8 h-0.5 bg-indigo-400 rounded-full my-1"></div>
+                            <p class="text-sm font-bold text-white text-center leading-tight">${item.vn}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('fc-pagination').innerText = `Set ${flashcardPage + 1} of ${totalPages}`;
+            document.getElementById('fc-prev-btn').disabled = flashcardPage === 0;
+            document.getElementById('fc-next-btn').disabled = flashcardPage === totalPages - 1;
+            
+            // Logic for Finish button appearance
+            if (flashcardPage === totalPages - 1) {
+                btnNext.classList.remove('hidden');
+                btnNext.innerHTML = 'Finish Learning <i class="fa-solid fa-check-double ml-2"></i>';
+            } else {
+                btnNext.classList.add('hidden');
+            }
+
+            // Scroll to container top to view new page
+            document.getElementById('task-container').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function changeFCPage(dir) {
+            flashcardPage += dir;
+            updateFCGrid();
+        }
+
+        function playAudio(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.85;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- TASK 3 & 4: QUIZZES ---
+        function renderContext(task, container) {
+            renderQuizBase(task, container, "Activity 3: Context Guessing", false);
+        }
+
+        function renderReading(task, container) {
+            renderQuizBase(task, container, "Activity 4: Reading Comprehension", true);
+        }
+
+        function renderQuizBase(task, container, actLabel, isReading) {
+            const qData = task.questions[subStepIndex];
+            
+            let html = `
+                <div class="mb-10 text-center">
+                    <span class="bg-orange-100 text-orange-800 text-sm font-bold px-4 py-1.5 rounded-full uppercase tracking-wide">${actLabel}</span>
+                    <h2 class="text-3xl font-extrabold mt-4 text-gray-800">${task.title}</h2>
+                    <p class="text-gray-400 mt-2">Choose the correct word to fill in the blank.</p>
+                </div>
+                <div class="max-w-4xl mx-auto">
+            `;
+
+            if (isReading) {
+                html += `
+                <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border border-indigo-50 mb-10 text-gray-700 leading-relaxed text-xl fade-in">
+                    ${task.passage}
+                </div>`;
+            }
+
+            const formattedQ = qData.q.replace('___', '<span class="inline-block min-w-[120px] border-b-4 border-indigo-200 mx-2 text-indigo-600 text-center">?</span>');
+
+            html += `
+                <div class="bg-white rounded-[3rem] p-10 lg:p-14 shadow-xl border border-gray-50 fade-in">
+                    <p class="text-2xl lg:text-3xl font-bold text-gray-800 mb-10 leading-snug">${formattedQ}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-1 gap-5" id="options-container">
+            `;
+
+            qData.options.forEach((opt, idx) => {
+                html += `
+                    <button onclick="selectOption(this, ${idx}, ${qData.ans})" class="quiz-option w-full text-left p-6 rounded-2xl border-2 border-gray-100 hover:border-indigo-400 hover:bg-indigo-50 transition-all font-bold text-xl text-gray-600 flex items-center justify-between">
+                        <span><span class="text-gray-300 mr-4">${String.fromCharCode(65 + idx)}.</span> ${opt}</span>
+                        <div class="status-icon"></div>
+                    </button>
+                `;
+            });
+
+            html += `
+                    </div>
+                </div>
+                <p class="text-center mt-10 text-lg font-bold text-gray-300 uppercase tracking-widest">Question ${subStepIndex + 1} / ${task.questions.length}</p>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function selectOption(btn, selectedIdx, correctIdx) {
+            if(isAnswered) return;
+            isAnswered = true;
+
+            const options = document.querySelectorAll('.quiz-option');
+            
+            options.forEach(opt => {
+                opt.classList.remove('hover:border-indigo-400', 'hover:bg-indigo-50');
+                opt.style.cursor = 'default';
+            });
+
+            if (selectedIdx === correctIdx) {
+                btn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+                btn.querySelector('.status-icon').innerHTML = '<i class="fa-solid fa-circle-check text-emerald-500 text-2xl"></i>';
+            } else {
+                btn.classList.add('border-red-500', 'bg-red-50', 'text-red-700');
+                btn.querySelector('.status-icon').innerHTML = '<i class="fa-solid fa-circle-xmark text-red-500 text-2xl"></i>';
+                
+                const correctBtn = options[correctIdx];
+                correctBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
+            }
+        }
+
+    </script>
+</body>
+</html>

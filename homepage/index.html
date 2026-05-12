@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Journey - Homepage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8fafc;
+            color: #1f2937;
+        }
+
+        .node-line {
+            position: absolute;
+            width: 4px;
+            background-color: #e5e7eb;
+            top: 40px;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 0;
+        }
+
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .status-badge {
+            transition: all 0.3s ease;
+        }
+
+        .lesson-card:hover .status-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="app" class="max-w-6xl mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden flex flex-col border-x border-gray-100">
+        
+        <!-- ================= HEADER ================= -->
+        <header class="bg-indigo-600 text-white p-8 rounded-b-[3rem] shadow-lg z-10">
+            <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold">English Master 🚀</h1>
+                    <p class="text-indigo-100 mt-1">Complete your 7-day streak!</p>
+                </div>
+                <div class="flex items-center bg-indigo-700 px-4 py-2 rounded-full text-sm font-bold border border-indigo-500 shadow-inner">
+                    <i class="fa-solid fa-fire text-yellow-300 mr-2"></i> 
+                    <span id="streak-count">0 Day Streak</span>
+                </div>
+            </div>
+            
+            <div class="mt-6 bg-indigo-500/30 p-4 rounded-2xl flex items-center justify-between border border-white/10">
+                <div class="flex-1 mr-4">
+                    <div class="flex justify-between text-xs font-bold uppercase mb-2">
+                        <span>Overall Progress</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="w-full bg-indigo-900/30 rounded-full h-2">
+                        <div id="total-progress-bar" class="bg-emerald-400 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div id="badge-icon" class="w-12 h-12 bg-indigo-400/20 rounded-full flex items-center justify-center text-2xl grayscale opacity-50">
+                    <i class="fa-solid fa-medal text-yellow-300"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- ================= ROADMAP ================= -->
+        <main class="flex-1 overflow-y-auto p-8 relative pb-32">
+            <h2 class="text-2xl font-bold text-gray-800 mb-12 text-center">Your Learning Path</h2>
+            
+            <div class="relative flex flex-col items-center gap-16">
+                <!-- Vertical connecting line -->
+                <div class="node-line" id="progress-line"></div>
+                
+                <!-- Lessons Container -->
+                <div id="lessons-container" class="w-full space-y-16">
+                    <!-- Lesson Nodes will be injected here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- ================= MODAL XÁC NHẬN (CONFIRM COMPLETION) ================= -->
+        <div id="confirm-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden p-4">
+            <div class="bg-white rounded-[2.5rem] p-8 max-w-sm w-full shadow-2xl text-center fade-in">
+                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h3 class="text-2xl font-extrabold text-gray-800 mb-2">Well Done!</h3>
+                <p class="text-gray-500 mb-8" id="modal-text">Did you finish this lesson?</p>
+                <div class="flex gap-4">
+                    <button onclick="closeModal()" class="flex-1 py-3 font-bold text-gray-400 hover:text-gray-600">Not yet</button>
+                    <button id="btn-confirm-complete" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-2xl font-bold shadow-lg shadow-emerald-200 transition active:scale-95">Yes, finished!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= FOOTER ================= -->
+        <footer class="absolute bottom-0 w-full bg-white p-6 border-t border-gray-100 shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.05)] z-20 flex justify-center">
+            <button onclick="resetProgress()" class="text-xs font-bold text-gray-300 hover:text-red-400 transition-colors uppercase tracking-widest">
+                <i class="fa-solid fa-rotate-right mr-1"></i> Reset My Progress
+            </button>
+        </footer>
+        
+    </div>
+
+    <script>
+        // --- CẤU HÌNH DỮ LIỆU ---
+        const lessonConfig = [
+            { 
+                id: 1, 
+                title: "School & Study", 
+                subtitle: "Basic Vocabulary", 
+                icon: "fa-book-open",
+                url: "https://kiotvietlnd.github.io/englishcourse/lesson1/"
+            },
+            { 
+                id: 2, 
+                title: "Review & Practice", 
+                subtitle: "Collocations Sprint", 
+                icon: "fa-gamepad",
+                url: "https://github.com/kiotvietlnd/englishcourse/tree/main/lesson%202"
+            },
+            { 
+                id: 3, 
+                title: "Grammar Mastery", 
+                subtitle: "Present Simple vs Continuous", 
+                icon: "fa-pencil-rule",
+                url: "#" 
+            },
+            { 
+                id: 4, 
+                title: "Listening Skills", 
+                subtitle: "School Conversations", 
+                icon: "fa-headphones",
+                url: "#"
+            },
+            { 
+                id: 5, 
+                title: "Weekly Review", 
+                subtitle: "Final Achievement Test", 
+                icon: "fa-trophy",
+                url: "#"
+            }
+        ];
+
+        // --- TRẠNG THÁI (STATE) ---
+        let completedLessons = JSON.parse(localStorage.getItem('eng_completed_lessons')) || [];
+        let pendingLessonId = null;
+
+        // --- HÀM KHỞI TẠO & RENDER ---
+        function init() {
+            renderRoadmap();
+            updateStats();
+        }
+
+        function renderRoadmap() {
+            const container = document.getElementById('lessons-container');
+            container.innerHTML = '';
+
+            lessonConfig.forEach((lesson, index) => {
+                const isCompleted = completedLessons.includes(lesson.id);
+                const isUnlocked = index === 0 || completedLessons.includes(lessonConfig[index - 1].id);
+                const isCurrent = isUnlocked && !isCompleted;
+
+                const nodeHtml = `
+                    <div class="lesson-card relative w-full flex items-center justify-center ${!isUnlocked ? 'opacity-40' : ''}">
+                        <!-- Content Side (Alternate Left/Right for design) -->
+                        <div class="absolute ${index % 2 === 0 ? 'left-1/2 ml-16' : 'right-1/2 mr-16'} hidden md:block w-48">
+                            <h4 class="font-extrabold text-gray-800 text-lg">${lesson.title}</h4>
+                            <p class="text-xs text-gray-400 font-bold uppercase tracking-tighter">${lesson.subtitle}</p>
+                        </div>
+
+                        <!-- Main Button Node -->
+                        <div class="relative z-10 flex flex-col items-center">
+                            <button 
+                                onclick="handleLessonClick(${lesson.id}, '${lesson.url}', ${isUnlocked})"
+                                class="status-icon w-24 h-24 rounded-[2rem] flex items-center justify-center text-4xl border-4 transition-all duration-300 shadow-xl
+                                ${isCompleted ? 'bg-emerald-500 text-white border-emerald-100' : 
+                                  isCurrent ? 'bg-indigo-500 text-white border-white scale-110 shadow-indigo-200' : 
+                                  'bg-white text-gray-300 border-gray-100 cursor-not-allowed'}"
+                            >
+                                <i class="fa-solid ${isCompleted ? 'fa-check' : lesson.icon}"></i>
+                                ${isUnlocked && !isCompleted ? '<span class="absolute -top-2 -right-2 flex h-6 w-6"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span><span class="relative inline-flex rounded-full h-6 w-6 bg-indigo-500 border-2 border-white"></span></span>' : ''}
+                            </button>
+                            
+                            <!-- Mobile Title -->
+                            <div class="md:hidden mt-4 text-center">
+                                <span class="block font-black text-gray-700">${lesson.title}</span>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase">${isCompleted ? 'Completed' : isUnlocked ? 'Available' : 'Locked'}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += nodeHtml;
+            });
+        }
+
+        // --- LOGIC XỬ LÝ ---
+        function handleLessonClick(id, url, isUnlocked) {
+            if (!isUnlocked) {
+                // Rung nhẹ hoặc thông báo bài học bị khóa
+                return;
+            }
+
+            if (completedLessons.includes(id)) {
+                // Nếu đã hoàn thành, cho phép học lại
+                window.open(url, '_blank');
+                return;
+            }
+
+            // Mở bài học
+            window.open(url, '_blank');
+
+            // Hiển thị modal để học sinh xác nhận khi họ quay lại tab này
+            pendingLessonId = id;
+            document.getElementById('modal-text').innerText = `Did you finish Lesson ${id}: ${lessonConfig.find(l => l.id === id).title}?`;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+            
+            document.getElementById('btn-confirm-complete').onclick = () => {
+                confirmCompletion(id);
+            };
+        }
+
+        function confirmCompletion(id) {
+            if (!completedLessons.includes(id)) {
+                completedLessons.push(id);
+                localStorage.setItem('eng_completed_lessons', JSON.stringify(completedLessons));
+            }
+            closeModal();
+            init(); // Re-render
+        }
+
+        function closeModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+        }
+
+        function updateStats() {
+            const streak = completedLessons.length;
+            const progress = Math.round((completedLessons.length / lessonConfig.length) * 100);
+            
+            document.getElementById('streak-count').innerText = `${streak} Day Streak`;
+            document.getElementById('progress-percent').innerText = `${progress}%`;
+            document.getElementById('total-progress-bar').style.width = `${progress}%`;
+
+            if (progress === 100) {
+                document.getElementById('badge-icon').classList.remove('grayscale', 'opacity-50');
+                document.getElementById('badge-icon').classList.add('bg-yellow-100', 'shadow-lg');
+            }
+        }
+
+        function resetProgress() {
+            if(confirm("Are you sure? This will delete your streak and unlock status.")) {
+                completedLessons = [];
+                localStorage.removeItem('eng_completed_lessons');
+                init();
+            }
+        }
+
+        // --- KHỞI CHẠY ---
+        window.onload = init;
+    </script>
+</body>
+</html>

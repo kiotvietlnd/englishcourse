@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Learning Journey - Grade 6-9</title>
+    <title>English Learning Journey - Lesson 1</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -48,96 +48,11 @@
     <!-- APP CONTAINER -->
     <div id="app" class="max-w-6xl mx-auto bg-white min-h-screen shadow-2xl relative overflow-hidden flex flex-col border-x border-gray-100">
         
-        <!-- ================= HOME VIEW ================= -->
-        <div id="home-view" class="flex-1 flex flex-col h-full w-full absolute transition-transform duration-500 ease-in-out">
-            <!-- Header -->
-            <div class="bg-indigo-600 text-white p-8 rounded-b-[3rem] shadow-lg z-10">
-                <div class="flex justify-between items-center mb-4">
-                    <h1 class="text-3xl font-extrabold">Welcome back, Scholar! 🚀</h1>
-                    <div class="flex items-center bg-indigo-700 px-4 py-2 rounded-full text-sm font-bold border border-indigo-500">
-                        <i class="fa-solid fa-fire text-yellow-300 mr-2"></i> <span id="streak-count">0 Day Streak</span>
-                    </div>
-                </div>
-                <p class="text-indigo-100 text-lg">Complete your 7-day streak to unlock the ultimate Achievement Badge!</p>
-            </div>
-
-            <!-- Map/Journey -->
-            <div class="flex-1 overflow-y-auto p-8 relative pb-32">
-                <h2 class="text-2xl font-bold text-gray-800 mb-10 text-center">Your Learning Path: Week 1</h2>
-                
-                <div class="relative flex flex-col items-center gap-12 z-10">
-                    <!-- Line connecting nodes -->
-                    <div class="absolute top-10 bottom-10 w-1.5 bg-gray-100 -z-10 left-1/2 transform -translate-x-1/2"></div>
-                    
-                    <!-- Lesson 1 (Active) -->
-                    <div class="relative w-full flex items-center justify-center cursor-pointer group" onclick="startLesson()">
-                        <div class="bg-indigo-500 text-white w-20 h-20 rounded-3xl flex items-center justify-center text-3xl font-bold shadow-xl shadow-indigo-100 z-10 border-4 border-white group-hover:scale-110 transition-transform rotate-3 group-hover:rotate-0">
-                            <i class="fa-solid fa-book-open"></i>
-                        </div>
-                        <div class="absolute left-1/2 ml-14 bg-white px-6 py-3 rounded-2xl shadow-md border border-indigo-50 whitespace-nowrap">
-                            <p class="font-bold text-indigo-600">Lesson 1</p>
-                            <p class="text-sm text-gray-500">School & Study</p>
-                        </div>
-                    </div>
-
-                    <!-- Lesson 2 (Locked) -->
-                    <div class="relative w-full flex items-center justify-center opacity-60">
-                        <div class="bg-gray-200 text-gray-400 w-16 h-16 rounded-3xl flex items-center justify-center text-2xl shadow-inner z-10 border-4 border-white">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-                        <div class="absolute right-1/2 mr-14 bg-gray-50 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap text-right">
-                            <p class="font-bold text-gray-500">Lesson 2</p>
-                            <p class="text-xs text-gray-400">Locked</p>
-                        </div>
-                    </div>
-
-                    <!-- Lesson 3 (Locked) -->
-                    <div class="relative w-full flex items-center justify-center opacity-60">
-                        <div class="bg-gray-200 text-gray-400 w-16 h-16 rounded-3xl flex items-center justify-center text-2xl shadow-inner z-10 border-4 border-white">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-                        <div class="absolute left-1/2 ml-14 bg-gray-50 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap">
-                            <p class="font-bold text-gray-500">Lesson 3</p>
-                            <p class="text-xs text-gray-400">Locked</p>
-                        </div>
-                    </div>
-
-                     <!-- Lesson 4 (Locked) -->
-                     <div class="relative w-full flex items-center justify-center opacity-60">
-                        <div class="bg-gray-200 text-gray-400 w-16 h-16 rounded-3xl flex items-center justify-center text-2xl shadow-inner z-10 border-4 border-white">
-                            <i class="fa-solid fa-lock"></i>
-                        </div>
-                        <div class="absolute right-1/2 mr-14 bg-gray-50 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap text-right">
-                            <p class="font-bold text-gray-500">Lesson 4</p>
-                            <p class="text-xs text-gray-400">Locked</p>
-                        </div>
-                    </div>
-
-                    <!-- Lesson 5 (Locked) -->
-                    <div class="relative w-full flex items-center justify-center opacity-60 mb-12">
-                        <div class="bg-yellow-100 text-yellow-500 w-20 h-20 rounded-full flex items-center justify-center text-3xl shadow-inner z-10 border-4 border-white">
-                            <i class="fa-solid fa-trophy"></i>
-                        </div>
-                        <div class="absolute left-1/2 ml-14 bg-gray-50 px-6 py-3 rounded-2xl shadow-sm border border-gray-100 whitespace-nowrap">
-                            <p class="font-bold text-gray-500">Lesson 5</p>
-                            <p class="text-sm text-gray-400">Weekly Review</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sticky Bottom CTA -->
-            <div class="absolute bottom-0 w-full bg-white p-6 border-t border-gray-100 shadow-[0_-15px_30px_-5px_rgba(0,0,0,0.05)] z-20">
-                <button onclick="startLesson()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-3xl shadow-xl shadow-indigo-100 transform transition active:scale-[0.98] text-xl">
-                    START LESSON 1 NOW <i class="fa-solid fa-bolt ml-2"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- ================= LESSON VIEW ================= -->
-        <div id="lesson-view" class="flex-1 flex flex-col h-full w-full absolute translate-x-full transition-transform duration-500 ease-in-out bg-slate-50">
+        <!-- ================= LESSON VIEW (START DIRECTLY HERE) ================= -->
+        <div id="lesson-view" class="flex-1 flex flex-col h-full w-full bg-slate-50">
             <!-- Header -->
             <div class="bg-white px-8 py-5 flex items-center shadow-sm z-10 border-b border-gray-100">
+                <!-- Close button now redirects to homepage -->
                 <button onclick="goHome()" class="w-12 h-12 flex items-center justify-center rounded-2xl hover:bg-red-50 text-gray-400 hover:text-red-500 transition-colors">
                     <i class="fa-solid fa-circle-xmark text-2xl"></i>
                 </button>
@@ -189,7 +104,6 @@
                     type: "flashcard",
                     title: "Flashcard Set A: Vocabulary & Collocations",
                     items: [
-                        // VOCABULARY (20 items)
                         { word: "subject", type: "n.", vn: "môn học", en: "an area you study at school", ex: "Math is my favorite subject because I like solving problems." },
                         { word: "timetable", type: "n.", vn: "thời khóa biểu", en: "a list showing when lessons happen", ex: "Our timetable changes every Monday." },
                         { word: "assignment", type: "n.", vn: "bài tập/nhiệm vụ được giao", en: "a piece of school work given by a teacher", ex: "I have to finish my English assignment tonight." },
@@ -210,7 +124,6 @@
                         { word: "uniform", type: "n.", vn: "đồng phục", en: "special clothes students wear at school", ex: "We wear a blue uniform at school." },
                         { word: "classmate", type: "n.", vn: "bạn cùng lớp", en: "a student in the same class", ex: "My classmate helps me with difficult homework." },
                         { word: "teacher", type: "n.", vn: "giáo viên", en: "a person who teaches students", ex: "Our teacher explains grammar clearly." },
-                        // COLLOCATIONS (9 items)
                         { word: "revise for a test", type: "verb + prep + noun", vn: "ôn tập cho bài kiểm tra", en: "review materials before an exam", ex: "I revise for a test by reading my notes again." },
                         { word: "submit an assignment", type: "verb + noun", vn: "nộp bài được giao", en: "hand in school work", ex: "We must submit an assignment before Friday." },
                         { word: "take notes", type: "verb + noun", vn: "ghi chú", en: "write down information", ex: "I take notes when the teacher explains new ideas." },
@@ -254,17 +167,10 @@
         const flashcardsPerPage = 10;
 
         // --- NAVIGATION LOGIC ---
-        function startLesson() {
-            document.getElementById('home-view').classList.add('-translate-x-full');
-            document.getElementById('lesson-view').classList.remove('translate-x-full');
-            currentTaskIndex = 0;
-            renderTask();
-        }
-
         function goHome() {
-            if(confirm("Are you sure you want to exit? Your progress will be lost.")) {
-                document.getElementById('lesson-view').classList.add('translate-x-full');
-                document.getElementById('home-view').classList.remove('-translate-x-full');
+            // Redirect to the Roadmap/Homepage (assuming index.html is in the parent or same folder)
+            if(confirm("Exit this lesson and return to the roadmap?")) {
+                window.location.href = "../index.html"; 
             }
         }
 
@@ -272,24 +178,19 @@
             const container = document.getElementById('task-container');
             container.innerHTML = `
                 <div class="flex flex-col items-center justify-center h-full text-center mt-20 fade-in px-4">
-                    <div class="bg-yellow-100 p-8 rounded-full mb-8">
+                    <div class="bg-yellow-100 p-8 rounded-full mb-8 relative">
                         <i class="fa-solid fa-trophy text-7xl text-yellow-500 animate-bounce"></i>
+                        <i class="fa-solid fa-star absolute top-0 right-0 text-3xl text-orange-400"></i>
                     </div>
                     <h2 class="text-4xl font-extrabold text-indigo-600 mb-4">Excellent Work!</h2>
-                    <p class="text-gray-500 text-xl max-w-lg mb-10">You have completed Lesson 1 and earned 50 XP. Keep it up!</p>
-                    <button onclick="returnHomeSuccess()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-12 rounded-2xl shadow-xl transition active:scale-95 text-lg">
-                        Back to Home
+                    <p class="text-gray-500 text-xl max-w-lg mb-10">You have completed Lesson 1. Go back to the roadmap to unlock Lesson 2!</p>
+                    <button onclick="goHome()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-12 rounded-2xl shadow-xl transition active:scale-95 text-lg">
+                        Back to Roadmap
                     </button>
                 </div>
             `;
             document.getElementById('btn-next').classList.add('hidden');
             updateProgress(100);
-        }
-
-        function returnHomeSuccess() {
-            document.getElementById('lesson-view').classList.add('translate-x-full');
-            document.getElementById('home-view').classList.remove('-translate-x-full');
-            document.getElementById('streak-count').innerText = '1 Day Streak';
         }
 
         function updateProgress(percent) {
@@ -302,7 +203,7 @@
             const btnNext = document.getElementById('btn-next');
             const btnCheck = document.getElementById('btn-check');
             btnCheck.classList.add('hidden');
-            btnNext.classList.add('hidden'); // Hidden by default, specific logic per task type below
+            btnNext.classList.add('hidden'); 
             btnNext.onclick = handleNext;
             isAnswered = false;
 
@@ -325,7 +226,6 @@
                     renderWarmup(task, container); 
                     break;
                 case 'flashcard': 
-                    // btnNext will only show on the last page of flashcards
                     renderFlashcard(task, container); 
                     break;
                 case 'context': 
@@ -396,7 +296,6 @@
         function renderFlashcard(task, container) {
             flashcardPage = 0;
             window.allFlashcards = task.items;
-            
             const totalPages = Math.ceil(window.allFlashcards.length / flashcardsPerPage);
 
             container.innerHTML = `
@@ -436,7 +335,6 @@
             grid.innerHTML = pageItems.map((item, idx) => `
                 <div class="perspective-1000 w-full mini-card cursor-pointer flashcard" onclick="this.classList.toggle('flipped')">
                     <div class="flashcard-inner relative w-full h-full text-center transform-style-3d shadow-md rounded-2xl border border-gray-50">
-                        <!-- Front -->
                         <div class="absolute w-full h-full backface-hidden bg-white rounded-2xl p-4 flex flex-col justify-center items-center">
                             <span class="text-[10px] font-bold text-indigo-300 bg-indigo-50 px-2 py-0.5 rounded-full mb-2 uppercase tracking-tighter">${item.type}</span>
                             <h3 class="text-base lg:text-lg font-black text-gray-800 text-center leading-tight mb-2">${item.word}</h3>
@@ -445,7 +343,6 @@
                             </button>
                             <p class="text-[10px] text-gray-400 mt-auto line-clamp-3 italic leading-tight">"${item.ex}"</p>
                         </div>
-                        <!-- Back -->
                         <div class="absolute w-full h-full backface-hidden bg-indigo-600 rounded-2xl p-4 flex flex-col justify-center items-center rotate-y-180 text-white overflow-y-auto">
                             <p class="text-[10px] font-medium text-indigo-100 mb-1 leading-tight">${item.en}</p>
                             <div class="w-8 h-0.5 bg-indigo-400 rounded-full my-1"></div>
@@ -459,7 +356,6 @@
             document.getElementById('fc-prev-btn').disabled = flashcardPage === 0;
             document.getElementById('fc-next-btn').disabled = flashcardPage === totalPages - 1;
             
-            // Logic for Finish button appearance
             if (flashcardPage === totalPages - 1) {
                 btnNext.classList.remove('hidden');
                 btnNext.innerHTML = 'Finish Learning <i class="fa-solid fa-check-double ml-2"></i>';
@@ -467,7 +363,6 @@
                 btnNext.classList.add('hidden');
             }
 
-            // Scroll to container top to view new page
             document.getElementById('task-container').scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -563,6 +458,9 @@
                 correctBtn.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-700');
             }
         }
+
+        // --- INIT ON LOAD ---
+        window.onload = renderTask;
 
     </script>
 </body>

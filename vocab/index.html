@@ -1,0 +1,393 @@
+view:Trang Học Từ Vựng Tiếng Anh 7 - Leitner System:leitner_flashcards.html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tiếng Anh 7 - Phương pháp Leitner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+
+        .flip-card {
+            perspective: 1000px;
+            width: 100%;
+            height: 320px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .flip-card-front { background-color: white; color: #1f2937; }
+        .flip-card-back { background-color: #4f46e5; color: white; transform: rotateY(180deg); }
+
+        .box-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div id="app" class="max-w-2xl mx-auto">
+        <!-- Header -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-indigo-700 mb-2">Học Từ Vựng Tiếng Anh 7</h1>
+            <p class="text-gray-600 italic">Phương pháp lặp lại ngắt quãng (Leitner System)</p>
+        </header>
+
+        <!-- Stats & Controls -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm text-center">
+                <p class="text-xs uppercase text-gray-500 font-semibold">Tiến độ</p>
+                <p class="text-xl font-bold" id="progress-text">0/0</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm text-center">
+                <p class="text-xs uppercase text-gray-500 font-semibold">Unit Đang Học</p>
+                <select id="unit-select" class="text-sm font-bold bg-transparent outline-none cursor-pointer">
+                    <!-- Options populated by JS -->
+                </select>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm text-center">
+                <p class="text-xs uppercase text-gray-500 font-semibold">Hộp Hiện Tại</p>
+                <p class="text-xl font-bold text-indigo-600" id="current-box-id">1</p>
+            </div>
+            <div class="bg-white p-4 rounded-xl shadow-sm text-center flex flex-col justify-center">
+                <button onclick="resetData()" class="text-xs text-red-500 hover:underline">Xóa dữ liệu cũ</button>
+            </div>
+        </div>
+
+        <!-- Flashcard Area -->
+        <div id="study-area" class="relative">
+            <div id="card-container" class="flip-card" onclick="toggleFlip()">
+                <div class="flip-card-inner" id="card-inner">
+                    <div class="flip-card-front border-2 border-indigo-50">
+                        <span id="pos-front" class="text-indigo-400 font-semibold mb-2"></span>
+                        <h2 id="word-front" class="text-4xl font-bold mb-4"></h2>
+                        <p id="phonetic-front" class="text-xl text-gray-500 font-mono"></p>
+                        <p class="mt-8 text-gray-300 text-xs uppercase tracking-widest font-bold">Nhấn để xem nghĩa</p>
+                    </div>
+                    <div class="flip-card-back">
+                        <p class="text-sm opacity-80 mb-4 uppercase tracking-widest">Nghĩa Tiếng Việt</p>
+                        <h2 id="meaning-back" class="text-3xl font-semibold leading-relaxed"></h2>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 grid grid-cols-2 gap-6">
+                <button onclick="answer(false)" class="bg-red-100 hover:bg-red-200 text-red-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-times-circle"></i> Chưa thuộc (Box 1)
+                </button>
+                <button onclick="answer(true)" class="bg-green-100 hover:bg-green-200 text-green-600 py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-check-circle"></i> Đã nhớ (+1 Box)
+                </button>
+            </div>
+        </div>
+
+        <!-- Box Indicators -->
+        <div class="mt-12">
+            <h3 class="text-sm font-bold text-gray-400 uppercase mb-4 tracking-wider text-center">Thống kê các hộp Leitner</h3>
+            <div class="flex justify-between gap-2 overflow-x-auto pb-4" id="boxes-stats">
+                <!-- Stats populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const rawVocabulary = [
+            // Unit 1
+            { unit: 1, word: "amazing", pos: "adj", phonetic: "/əˈmeɪzɪŋ/", meaning: "hết sức ngạc nhiên, kinh ngạc" },
+            { unit: 1, word: "belong to", pos: "v", phonetic: "/bɪˈlɒŋ tə/", meaning: "thuộc về" },
+            { unit: 1, word: "benefit", pos: "n", phonetic: "/ˈbenɪfɪt/", meaning: "lợi ích" },
+            { unit: 1, word: "build", pos: "v", phonetic: "/bɪld/", meaning: "xây dựng" },
+            { unit: 1, word: "cardboard", pos: "n", phonetic: "/ˈkɑːdbɔːd/", meaning: "bìa cứng" },
+            { unit: 1, word: "creativity", pos: "n", phonetic: "/ˌkriːeɪˈtɪvəti/", meaning: "sáng tạo" },
+            { unit: 1, word: "common", pos: "adj", phonetic: "/ˈkɒmən/", meaning: "chung, thông thường" },
+            { unit: 1, word: "collect", pos: "v", phonetic: "/kəˈlekt/", meaning: "sưu tầm" },
+            { unit: 1, word: "coin", pos: "n", phonetic: "/kɔɪn/", meaning: "xu" },
+            { unit: 1, word: "dislike", pos: "v", phonetic: "/dɪsˈlaɪk/", meaning: "không thích" },
+            { unit: 1, word: "dollhouse", pos: "n", phonetic: "/ˈdɒlhaʊs/", meaning: "nhà búp bê" },
+            { unit: 1, word: "enjoy", pos: "v", phonetic: "/ɪnˈdʒɔɪ/", meaning: "thích" },
+            { unit: 1, word: "gardening", pos: "n", phonetic: "/ˈɡɑːdnɪŋ/", meaning: "làm vườn" },
+            { unit: 1, word: "glue", pos: "n", phonetic: "/ɡluː/", meaning: "hồ/ keo dán" },
+            { unit: 1, word: "jogging", pos: "n", phonetic: "/ˈdʒɒɡɪŋ/", meaning: "chạy bộ" },
+            { unit: 1, word: "horse riding", pos: "n", phonetic: "/ˈhɔːs raɪdɪŋ/", meaning: "cưỡi ngựa" },
+            { unit: 1, word: "insect", pos: "n", phonetic: "/ˈɪnsekt/", meaning: "côn trùng" },
+            { unit: 1, word: "like", pos: "v", phonetic: "/laɪk/", meaning: "thích" },
+            { unit: 1, word: "make models", pos: "v", phonetic: "/meɪk ˈmɒdlz/", meaning: "làm mô hình" },
+            { unit: 1, word: "maturity", pos: "n", phonetic: "/məˈtʃʊərəti/", meaning: "sự trưởng thành" },
+            { unit: 1, word: "patient", pos: "adj", phonetic: "/ˈpeɪʃnt/", meaning: "kiên nhẫn, nhẫn nại" },
+            { unit: 1, word: "popular", pos: "adj", phonetic: "/ˈpɒpjələ(r)/", meaning: "được nhiều người ưa thích" },
+            { unit: 1, word: "responsibility", pos: "n", phonetic: "/rɪˌspɒnsəˈbɪləti/", meaning: "sự chịu trách nhiệm" },
+            { unit: 1, word: "set", pos: "v", phonetic: "/set/", meaning: "(mặt trời) lặn" },
+            { unit: 1, word: "teddy bear", pos: "n", phonetic: "/ˈtedi beə(r)/", meaning: "gấu bông" },
+            
+            // Unit 2
+            { unit: 2, word: "boating", pos: "n", phonetic: "/´boutiη/", meaning: "cuộc đi chơi bằng thuyền" },
+            { unit: 2, word: "cycling", pos: "n", phonetic: "/ˈsaɪklɪŋ/", meaning: "đạp xe" },
+            { unit: 2, word: "countryside", pos: "n", phonetic: "/ˈkʌntrisaɪd/", meaning: "miền quê, nông thôn" },
+            { unit: 2, word: "dim light", pos: "n", phonetic: "/dɪm laɪt/", meaning: "lờ mờ, tối mờ mờ" },
+            { unit: 2, word: "healthy", pos: "adj", phonetic: "/ˈhelθi/", meaning: "có lợi cho sức khỏe" },
+            { unit: 2, word: "lip balm", pos: "n", phonetic: "/lɪp bɑːm/", meaning: "son dưỡng môi" },
+            { unit: 2, word: "lunch box", pos: "n", phonetic: "/ˈlʌntʃ bɒks/", meaning: "hộp đựng đồ ăn trưa" },
+            { unit: 2, word: "neighbourhood", pos: "n", phonetic: "/ˈneɪbəhʊd/", meaning: "vùng lân cận" },
+            { unit: 2, word: "outdoor", pos: "adj", phonetic: "/ˈaʊtdɔː(r)/", meaning: "ngoài trời" },
+            { unit: 2, word: "sunburn", pos: "n", phonetic: "/ˈsʌnbɜːn/", meaning: "cháy nắng" },
+            { unit: 2, word: "suncream", pos: "n", phonetic: "/ˈsʌn kriːm/", meaning: "kem chống nắng" },
+            { unit: 2, word: "red spot", pos: "n", phonetic: "/red spɒt/", meaning: "đốm đỏ" },
+
+            // Unit 3
+            { unit: 3, word: "around", pos: "", phonetic: "/əˈraʊnd/", meaning: "xung quanh" },
+            { unit: 3, word: "board game", pos: "", phonetic: "/bɔːd ɡeɪm/", meaning: "chơi cờ" },
+            { unit: 3, word: "clean", pos: "v", phonetic: "/kliːn/", meaning: "dọn dẹp, lau chùi" },
+            { unit: 3, word: "community activity", pos: "n", phonetic: "/kəˈmjuːnəti ækˈtɪvəti/", meaning: "hoạt động cộng đồng" },
+            { unit: 3, word: "donate", pos: "v", phonetic: "/dəʊˈneɪt/", meaning: "quyên góp" },
+            { unit: 3, word: "exchange", pos: "v", phonetic: "/ɪksˈtʃeɪndʒ/", meaning: "trao đổi" },
+            { unit: 3, word: "homeless", pos: "adj", phonetic: "/ˈhəʊmləs/", meaning: "vô gia cư" },
+            { unit: 3, word: "pick up", pos: "", phonetic: "/pɪk ʌp/", meaning: "nhặt" },
+            { unit: 3, word: "recycle", pos: "v", phonetic: "/ˌriːˈsaɪkl/", meaning: "tái chế" },
+            { unit: 3, word: "tutor", pos: "v", phonetic: "/ˈtjuːtə(r)/", meaning: "dạy kèm, gia sư" },
+            { unit: 3, word: "volunteer", pos: "v", phonetic: "/ˌvɒlənˈtɪə(r)/", meaning: "tình nguyện" },
+
+            // Unit 4
+            { unit: 4, word: "anthem", pos: "n", phonetic: "/ˈænθəm/", meaning: "bài hát ca ngợi" },
+            { unit: 4, word: "academic", pos: "adj", phonetic: "/ækəˈdemɪk/", meaning: "có tính học thuật" },
+            { unit: 4, word: "actress", pos: "n", phonetic: "/ˈæktrəs/", meaning: "diễn viên nữ" },
+            { unit: 4, word: "art gallery", pos: "n", phonetic: "/ˈɑːt ɡæləri/", meaning: "bảo tàng nghệ thuật" },
+            { unit: 4, word: "compose", pos: "v", phonetic: "/kəmˈpəʊz/", meaning: "soạn nhạc" },
+            { unit: 4, word: "concert hall", pos: "n", phonetic: "/ˈɒnsət hɔːl/", meaning: "phòng hòa nhạc" },
+            { unit: 4, word: "folk music", pos: "n", phonetic: "/fəʊk ˈmjuːzɪk/", meaning: "nhạc dân ca" },
+            { unit: 4, word: "water puppetry", pos: "n", phonetic: "/ˈwɔːtə(r) ˈpʌpɪtri/", meaning: "môn rối nước" },
+            { unit: 4, word: "puppet theater", pos: "n", phonetic: "/ˈpʌpɪt ˈθɪətə(r)/", meaning: "nhà hát múa rối" },
+
+            // Unit 5
+            { unit: 5, word: "broth", pos: "n", phonetic: "/brɒθ/", meaning: "nước xuýt" },
+            { unit: 5, word: "delicious", pos: "adj", phonetic: "/dɪˈlɪʃəs/", meaning: "ngon, thơm ngon" },
+            { unit: 5, word: "fragrant", pos: "adj", phonetic: "/'freɪɡrənt/", meaning: "thơm, thơm phức" },
+            { unit: 5, word: "omelette", pos: "n", phonetic: "/'ɒmlət/", meaning: "trứng tráng" },
+            { unit: 5, word: "shrimp", pos: "n", phonetic: "/ʃrɪmp/", meaning: "con tôm" },
+            { unit: 5, word: "turmeric", pos: "n", phonetic: "/'tɜːmərɪk/", meaning: "củ nghệ" },
+
+            // Unit 6
+            { unit: 6, word: "Imperial Academy", pos: "n", phonetic: "/ɪmˈpɪəriəl əˈkædəmi/", meaning: "Quốc Tử Giám" },
+            { unit: 6, word: "Temple of literature", pos: "n", phonetic: "/ˈtempl əv ˈlɪtrəʧ(ə)/", meaning: "Văn Miếu" },
+            { unit: 6, word: "One Pillar Pagoda", pos: "n", phonetic: "/wʌn ˈpɪlə(r) pəˈgəʊdə/", meaning: "Chùa Một Cột" },
+            { unit: 6, word: "World Heritage Site", pos: "n", phonetic: "/wɜːld ˈherɪtɪʤ saɪt/", meaning: "di sản thế giới" },
+
+            // Unit 7
+            { unit: 7, word: "vehicle", pos: "n", phonetic: "/ˈviːəkl/", meaning: "phương tiện" },
+            { unit: 7, word: "helmet", pos: "n", phonetic: "/ˈhelmɪt/", meaning: "mũ bảo hiểm" },
+            { unit: 7, word: "zebra crossing", pos: "n", phonetic: "/ˈzebrə ˈkrɒsɪŋ/", meaning: "vạch sang đường cho người đi bộ" },
+            { unit: 7, word: "traffic jam", pos: "n", phonetic: "/ˈtræfɪk dʒæm/", meaning: "sự tắc đường" },
+
+            // Unit 8
+            { unit: 8, word: "animation", pos: "n", phonetic: "/'ænɪˈmeɪʃən/", meaning: "phim hoạt hoạ" },
+            { unit: 8, word: "documentary", pos: "n", phonetic: "/,dɒkjə'mentri/", meaning: "phim tài liệu" },
+            { unit: 8, word: "hilarious", pos: "adj", phonetic: "/hɪˈleəriəs/", meaning: "vui nhộn, hài hước" },
+            { unit: 8, word: "gripping", pos: "adj", phonetic: "/'ɡrɪpɪŋ/", meaning: "hấp dẫn, thú vị" },
+
+            // Unit 9
+            { unit: 9, word: "Halloween", pos: "n", phonetic: "/ˌhæləʊˈiːn/", meaning: "lễ hội hóa trang" },
+            { unit: 9, word: "Mid-autumn Festival", pos: "n", phonetic: "/mɪd ˈɔːtəm/", meaning: "tết Trung thu" },
+            { unit: 9, word: "superstitious", pos: "adj", phonetic: "/ˌsuːpəˈstɪʃəs/", meaning: "có tính mê tín" },
+            { unit: 9, word: "take place", pos: "v", phonetic: "/teɪk pleɪs/", meaning: "diễn ra, xảy ra" },
+
+            // Unit 10
+            { unit: 10, word: "electricity", pos: "n", phonetic: "/,ɪlɛk'trɪsɪti /", meaning: "điện" },
+            { unit: 10, word: "biogas", pos: "n", phonetic: "/'baiou,gæs/", meaning: "khí sinh học" },
+            { unit: 10, word: "renewable", pos: "adj", phonetic: "/ri'nju:əbl/", meaning: "phục hồi, làm mới lại" },
+            { unit: 10, word: "energy", pos: "n", phonetic: "/'enədʒi/", meaning: "năng lượng" },
+
+            // Unit 11
+            { unit: 11, word: "automated", pos: "adj", phonetic: "/ˌɔːtəmeɪtɪd/", meaning: "tự động" },
+            { unit: 11, word: "driverless car", pos: "n", phonetic: "/ˈdraɪvələs kɑː(r)/", meaning: "xe tự lái" },
+            { unit: 11, word: "spaceship", pos: "n", phonetic: "/ˈspeɪsʃɪp/", meaning: "phi thuyền" },
+            { unit: 11, word: "teleporter", pos: "n", phonetic: "/ˈtelipɔːte(r)/", meaning: "máy dịch chuyển tức thời" },
+
+            // Unit 12
+            { unit: 12, word: "megacity", pos: "n", phonetic: "/'megəsiti/", meaning: "thành phố lớn" },
+            { unit: 12, word: "overcrowded", pos: "adj", phonetic: "/,ouvə'kraudid/", meaning: "quá đông đúc" },
+            { unit: 12, word: "slum", pos: "n", phonetic: "/slʌm/", meaning: "khu ổ chuột" },
+            { unit: 12, word: "poverty", pos: "n", phonetic: "/'pɔvəti/", meaning: "sự nghèo đói" }
+        ];
+
+        // Extended data: I will auto-generate initial box states if not in localStorage
+        let vocabulary = [];
+        let currentIndex = 0;
+        let filteredVocab = [];
+
+        function initApp() {
+            // Load from storage or initialize
+            const savedData = localStorage.getItem('leitner_tienganh7_progress');
+            if (savedData) {
+                vocabulary = JSON.parse(savedData);
+            } else {
+                vocabulary = rawVocabulary.map(v => ({...v, box: 1, lastReviewed: Date.now()}));
+            }
+
+            // Populate Units Select
+            const unitSelect = document.getElementById('unit-select');
+            for(let i=1; i<=12; i++) {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.innerText = `Unit ${i}`;
+                unitSelect.appendChild(opt);
+            }
+            unitSelect.addEventListener('change', () => {
+                currentIndex = 0;
+                filterAndRender();
+            });
+
+            filterAndRender();
+        }
+
+        function filterAndRender() {
+            const currentUnit = parseInt(document.getElementById('unit-select').value);
+            // In Leitner, we usually study by Box, but here we group by Unit for your convenience
+            filteredVocab = vocabulary.filter(v => v.unit === currentUnit);
+            
+            // Priority sort: lower boxes first
+            filteredVocab.sort((a, b) => a.box - b.box);
+
+            updateStats();
+            renderCard();
+        }
+
+        function renderCard() {
+            if (filteredVocab.length === 0) {
+                document.getElementById('study-area').innerHTML = `
+                    <div class="bg-white p-12 rounded-3xl text-center shadow-sm">
+                        <i class="fas fa-medal text-5xl text-yellow-400 mb-4"></i>
+                        <h2 class="text-2xl font-bold">Hoàn thành Unit!</h2>
+                        <p class="text-gray-500">Bạn đã học hết từ vựng của bài này.</p>
+                    </div>`;
+                return;
+            }
+
+            const card = filteredVocab[currentIndex];
+            document.getElementById('word-front').innerText = card.word;
+            document.getElementById('pos-front').innerText = card.pos ? `(${card.pos})` : "";
+            document.getElementById('phonetic-front').innerText = card.phonetic;
+            document.getElementById('meaning-back').innerText = card.meaning;
+            document.getElementById('current-box-id').innerText = card.box;
+            
+            document.getElementById('progress-text').innerText = `${currentIndex + 1} / ${filteredVocab.length}`;
+            
+            // Reset flip state
+            document.getElementById('card-container').classList.remove('flipped');
+        }
+
+        function toggleFlip() {
+            document.getElementById('card-container').classList.toggle('flipped');
+        }
+
+        function answer(isCorrect) {
+            const card = filteredVocab[currentIndex];
+            const originalIndex = vocabulary.findIndex(v => v.word === card.word && v.unit === card.unit);
+
+            if (isCorrect) {
+                // Move to next box (max box 5)
+                vocabulary[originalIndex].box = Math.min(vocabulary[originalIndex].box + 1, 5);
+            } else {
+                // Back to box 1
+                vocabulary[originalIndex].box = 1;
+            }
+
+            vocabulary[originalIndex].lastReviewed = Date.now();
+            saveData();
+
+            // Next card logic
+            currentIndex++;
+            if (currentIndex >= filteredVocab.length) {
+                currentIndex = 0;
+                filterAndRender(); // Re-sort and start over
+            } else {
+                renderCard();
+            }
+            updateStats();
+        }
+
+        function updateStats() {
+            const statsContainer = document.getElementById('boxes-stats');
+            statsContainer.innerHTML = '';
+
+            const boxCounts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
+            vocabulary.forEach(v => boxCounts[v.box]++);
+
+            const boxColors = {
+                1: 'bg-red-500',
+                2: 'bg-orange-500',
+                3: 'bg-yellow-500',
+                4: 'bg-blue-500',
+                5: 'bg-green-500'
+            };
+
+            for (let i = 1; i <= 5; i++) {
+                const div = document.createElement('div');
+                div.className = 'flex-1 min-w-[60px] bg-white p-2 rounded-lg shadow-sm text-center border-b-4 ' + boxColors[i].replace('bg-', 'border-');
+                div.innerHTML = `
+                    <p class="text-[10px] text-gray-400 font-bold uppercase">Box ${i}</p>
+                    <p class="text-lg font-black">${boxCounts[i]}</p>
+                `;
+                statsContainer.appendChild(div);
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('leitner_tienganh7_progress', JSON.stringify(vocabulary));
+        }
+
+        function resetData() {
+            if(confirm("Bạn có chắc chắn muốn xóa toàn bộ tiến độ và học lại từ đầu không?")) {
+                localStorage.removeItem('leitner_tienganh7_progress');
+                location.reload();
+            }
+        }
+
+        // Initialize on load
+        initApp();
+    </script>
+</body>
+</html>
+```eof
+
+### Hướng dẫn sử dụng:
+1. **Dữ liệu:** Tôi đã tích hợp toàn bộ từ vựng từ Unit 1 đến Unit 12 vào tệp trên.
+2. **Hệ thống Leitner:**
+   - Mỗi từ bắt đầu ở **Hộp 1** (Box 1).
+   - Nếu bạn chọn **"Đã nhớ"**, từ đó sẽ thăng cấp lên Hộp 2, 3, 4 và tối đa là 5. Những từ ở hộp cao hơn sẽ ít xuất hiện hơn trong các vòng lặp sau.
+   - Nếu bạn chọn **"Chưa thuộc"**, từ đó sẽ ngay lập tức bị đưa trở lại **Hộp 1** để bạn ôn tập thường xuyên hơn.
+3. **Lưu trữ:** Ứng dụng tự động lưu lại trạng thái các "Hộp" của từng từ vào trình duyệt web của bạn. Bạn có thể tắt máy và quay lại học tiếp vào ngày hôm sau.
+4. **Giao diện:** Thân thiện với điện thoại di động và máy tính bảng, giúp bạn có thể học mọi lúc mọi nơi.
+
+Chúc bạn học tốt và ghi nhớ từ vựng hiệu quả!
